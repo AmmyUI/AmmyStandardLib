@@ -62,16 +62,16 @@ mixin AddSetter(property, value, targetName=none) for Style {
   combine Setters: #Setter($property, $value, $targetName) {}
 }*/
 
-alias DataTrigger(binding, bindingValue) {
-  DataTrigger { Binding: $binding, Value: $bindingValue }
+alias DataTrigger(targetType, binding, bindingValue) {
+  DataTrigger { TargetType: $targetType, Binding: $binding, Value: $bindingValue }
 }
 
 alias Trigger(property, value) {
   Trigger { Property: $property, Value: $value }
 }
 
-alias DataTrigger_SetProperty(binding, bindingValue, property, propertyValue) {
-  @DataTrigger ($binding, $bindingValue) {
+alias DataTrigger_SetProperty(targetType, binding, bindingValue, property, propertyValue) {
+  @DataTrigger ($targetType, $binding, $bindingValue) {
     #Setter($property, $propertyValue)
   }
 }
@@ -82,12 +82,12 @@ alias Trigger_SetProperty(triggerProperty, triggerValue, property, propertyValue
   }
 }
 
-alias VisibleIf_DataTrigger(binding, valueForVisible) {
-  @DataTrigger_SetProperty($binding, $valueForVisible, "Visibility", "Visible") {}
+alias VisibleIf_DataTrigger(targetType, binding, valueForVisible) {
+  @DataTrigger_SetProperty($targetType, $binding, $valueForVisible, "Visibility", "Visible") {}
 }
 
-alias CollapsedIf_DataTrigger(binding, valueForCollapsed) {
-  @DataTrigger_SetProperty($binding, $valueForCollapsed, "Visibility", "Collapsed") {}
+alias CollapsedIf_DataTrigger(targetType, binding, valueForCollapsed) {
+  @DataTrigger_SetProperty($targetType, $binding, $valueForCollapsed, "Visibility", "Collapsed") {}
 }
 
 alias StackPanelHorizontal() {
@@ -96,13 +96,73 @@ alias StackPanelHorizontal() {
   }
 }
 
-mixin Property_OnBinding(binding, bindingValue, property, propertyValue, initialValue) for Style {
+mixin Property_OnBinding(targetType, binding, bindingValue, property, propertyValue, initialValue) for Style {
   #Setter("Visibility", $initialValue)
   combine Triggers: [
-    @DataTrigger_SetProperty($binding, $bindingValue, $property, $propertyValue) {}
+    @DataTrigger_SetProperty($targetType, $binding, $bindingValue, $property, $propertyValue) {}
   ]
 }
 
-mixin Visibility_OnBinding(binding, bindingValue, visibilityValue="Visible", initialValue="Collapsed") for Style {
-  #Property_OnBinding($binding, $bindingValue, "Visibility", $visibilityValue, $initialValue)
+mixin Visibility_OnBinding(targetType, binding, bindingValue, visibilityValue="Visible", initialValue="Collapsed") for Style {
+  #Property_OnBinding($targetType, $binding, $bindingValue, "Visibility", $visibilityValue, $initialValue)
+}
+
+alias Constraint(type, property, constant=none, factor=none, elementName=none) {
+  ConstraintExpression {
+    Type: $type
+    Property: $property
+    Constant: $constant
+    Factor: $factor
+    ElementName: $elementName
+  }
+}
+
+mixin XConstraintFromParent(property, constant=none, factor=none) for Element {
+  RelativeLayout.XConstraint: @Constraint("RelativeToParent", $property, $constant, $factor) { }
+}
+
+mixin YConstraintFromParent(property, constant=none, factor=none) for Element {
+  RelativeLayout.YConstraint: @Constraint("RelativeToParent", $property, $constant, $factor) { }
+}
+
+mixin XConstraintFromView(elementName, property, constant=none, factor=none) for Element {
+  RelativeLayout.XConstraint: @Constraint("RelativeToView", $property, $constant, $factor, $elementName) { }
+}
+
+mixin YConstraintFromView(elementName, property, constant=none, factor=none) for Element {
+  RelativeLayout.YConstraint: @Constraint("RelativeToView", $property, $constant, $factor, $elementName) { }
+}
+
+mixin XConstraintConstant(property=none, constant=none) for Element {
+  RelativeLayout.XConstraint: @Constraint("Constant", $property, $constant) { }
+}
+
+mixin YConstraintConstant(property=none, constant=none) for Element {
+  RelativeLayout.YConstraint: @Constraint("Constant", $property, $constant) { }
+}
+
+mixin WidthConstraintFromParent(property, constant=none, factor=none) for Element {
+  RelativeLayout.WidthConstraint: @Constraint("RelativeToParent", $property, $constant, $factor) { }
+}
+
+mixin HeightConstraintFromParent(property, constant=none, factor=none) for Element {
+  RelativeLayout.HeightConstraint: @Constraint("RelativeToParent", $property, $constant, $factor) { }
+}
+
+mixin WidthConstraintFromView(elementName, property, constant=none, factor=none) for Element {
+  RelativeLayout.WidthConstraint: @Constraint("RelativeToView", $property, $constant, $factor, $elementName) { }
+}
+
+mixin HeightConstraintFromView(elementName, property, constant=none, factor=none) for Element {
+  RelativeLayout.HeightConstraint: @Constraint("RelativeToView", $property, $constant, $factor, $elementName) { }
+}
+
+mixin WidthConstraintConstant(property, constant=none) for Element {
+  RelativeLayout.WidthConstraint: @Constraint("Constant", $property, $constant) {    
+  }
+}
+
+mixin HeightConstraintConstant(property, constant=none) for Element {
+  RelativeLayout.HeightConstraint: @Constraint("Constant", $property, $constant) {    
+  }
 }
